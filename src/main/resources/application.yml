@@ -7,3 +7,9 @@ spring:
 logging:
   level:
     org.springframework.r2dbc.core: debug
+
+gov:
+  api:
+    short_term_url: http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0
+    mid_term_url: http://apis.data.go.kr/1360000/MidFcstInfoService
+    key: your_own_key

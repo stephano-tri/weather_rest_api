@@ -13,5 +13,26 @@ services:
     volumes:
       - /Users/eomjihwan/mysql:/var/lib/mysql
 
+  elasticsearch:
+    image: elasticsearch
+    mem_limit: 2g
+    environment:
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+      - xpack.security.enabled=false
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - /Users/eomjihwan/ES:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+    healthcheck:
+      test: curl -u elastic:elastic -s -f elasticsearch:9200/_cat/health >/dev/null || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
   weather-service:
     build: .
