@@ -25,13 +25,18 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-webflux:3.1.1")
 
     //logging
-    implementation("org.springframework.boot:spring-boot-starter-log4j2:3.1.1")
+    implementation("org.springframework.boot:spring-boot-starter-log4j2")
+    modules {
+        module("org.springframework.boot:spring-boot-starter-logging") {
+            replacedBy("org.springframework.boot:spring-boot-starter-log4j2", "Use Log4j2 instead of Logback")
+        }
+    }
 
     //R2DBC(whole db connections)
     implementation("org.springframework.data:spring-data-r2dbc:3.1.1")
 
-
 }
+
 
 tasks.withType<KotlinCompile> {
     kotlinOptions {
@@ -39,6 +44,8 @@ tasks.withType<KotlinCompile> {
         jvmTarget="17"
     }
 }
+
+
 
 tasks.withType<Test> {
     useJUnitPlatform()

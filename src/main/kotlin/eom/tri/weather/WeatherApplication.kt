@@ -7,7 +7,6 @@ import org.springframework.data.r2dbc.repository.config.EnableR2dbcRepositories
 import org.springframework.scheduling.annotation.EnableScheduling
 
 @EnableScheduling
-@EnableR2dbcAuditing
 @EnableR2dbcRepositories
 @SpringBootApplication
 class WeatherApplication

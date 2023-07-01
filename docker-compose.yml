@@ -12,3 +12,6 @@ services:
       - --collation-server=utf8mb4_unicode_ci
     volumes:
       - /Users/eomjihwan/mysql:/var/lib/mysql
+
+  weather-service:
+    build: .
