@@ -7,11 +7,11 @@ import org.springframework.stereotype.Service
 
 @Service
 class WeatherDataCollectingService {
-    val logger: Logger= LoggerFactory.getLogger(WeatherDataCollectingService::class.java)
+    val logger: Logger = LoggerFactory.getLogger(WeatherDataCollectingService::class.java)
 
-
-    @Scheduled(fixedDelay = 1000)
+    @Scheduled(fixedDelay = 100000)
     fun collectWeatherData() {
         logger.info("collectWeatherData func executed")
     }
+
 }
