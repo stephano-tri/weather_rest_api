@@ -1,8 +1,12 @@
 spring:
   r2dbc:
-    url: r2dbc:pool:mysql://localhost:3306/weather
+    url: r2dbc:mysql://mysql:3306/weather?allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Seoul
     username: root
     password: stephano-tri
+    pool:
+      initial-size: 10
+      max-size: 100
+      validation-query: SELECT 1
 
 logging:
   level:
@@ -10,6 +14,7 @@ logging:
 
 gov:
   api:
-    short_term_url: http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0
-    mid_term_url: http://apis.data.go.kr/1360000/MidFcstInfoService
-    key: your_own_key
+    short_term_url: https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0
+    mid_term_url: https://apis.data.go.kr/1360000/MidFcstInfoService
+    key: DZSo8r1Wa2HpQdHAhqyCdELjAfBDOoTTqcPzrU6Osv0aHXGSpkK0K1WlfwBzaRoUA70qX02i%2BMHPZ51aGobL5Q%3D%3D
+
