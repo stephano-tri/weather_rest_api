@@ -21,6 +21,8 @@ repositories {
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
+    //to support kotlin coroutines and functional programming
+    implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     implementation("org.springframework.boot:spring-boot-starter-webflux:3.1.1")
 
@@ -34,7 +36,12 @@ dependencies {
 
     //R2DBC(whole db connections)
     implementation("org.springframework.data:spring-data-r2dbc:3.1.1")
+    implementation("com.github.jasync-sql:jasync-r2dbc-mysql:2.1.23")
+    implementation("io.r2dbc:r2dbc-pool:1.0.0.RELEASE")
 
+    //for serialization
+    implementation("com.google.code.gson:gson:2.10.1")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 }
 
 
