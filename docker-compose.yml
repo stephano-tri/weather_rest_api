@@ -3,13 +3,15 @@ services:
   mysql:
     image: mysql:8.0
     container_name: mysql
+    restart: always
     ports:
-      - 3306:3306 # HOST:CONTAINER
+      - "3306:3306" # HOST:CONTAINER
     environment:
       MYSQL_ROOT_PASSWORD: stephano-tri
     command:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
+      - --default-authentication-plugin=mysql_native_password
     volumes:
       - /Users/eomjihwan/mysql:/var/lib/mysql
 
@@ -36,3 +38,5 @@ services:
 
   weather-service:
     build: .
+    ports:
+      - "8080:8080"
