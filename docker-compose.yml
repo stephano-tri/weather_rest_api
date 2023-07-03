@@ -3,15 +3,40 @@ services:
   mysql:
     image: mysql:8.0
     container_name: mysql
+    restart: always
     ports:
-      - 3306:3306 # HOST:CONTAINER
+      - "3306:3306" # HOST:CONTAINER
     environment:
       MYSQL_ROOT_PASSWORD: stephano-tri
     command:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
+      - --default-authentication-plugin=mysql_native_password
     volumes:
       - /Users/eomjihwan/mysql:/var/lib/mysql
 
+  elasticsearch:
+    image: elasticsearch
+    mem_limit: 2g
+    environment:
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+      - xpack.security.enabled=false
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - /Users/eomjihwan/ES:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+    healthcheck:
+      test: curl -u elastic:elastic -s -f elasticsearch:9200/_cat/health >/dev/null || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
   weather-service:
     build: .
+    ports:
+      - "8080:8080"
