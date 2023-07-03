@@ -1,8 +1,7 @@
 package eom.tri.weather.controller
 
-import eom.tri.weather.model.Address
-import eom.tri.weather.model.Government.GovernmentPublicAPIResponse
-import eom.tri.weather.model.ShortTermForecast
+import eom.tri.weather.model.GovernmentAPI.Address
+import eom.tri.weather.model.GovernmentAPI.GovernmentPublicAPIResponse
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestParam
 import reactor.core.publisher.Mono

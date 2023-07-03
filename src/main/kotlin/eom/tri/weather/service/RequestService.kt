@@ -1,7 +1,7 @@
 package eom.tri.weather.service
 
-import eom.tri.weather.model.Government.GovernmentPublicAPIResponse
-import eom.tri.weather.model.MidTermForecast
+import eom.tri.weather.model.GovernmentAPI.GovernmentPublicAPIResponse
+import eom.tri.weather.model.GovernmentAPI.MidTermForecast
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
@@ -25,7 +25,7 @@ class RequestService {
             .uriBuilderFactory(buildFactory)
             .build()
             .get()
-            .uri("$govShortTermEndpoint/getVilageFcst?serviceKey=${govApiKey}&numOfRows=10&pageNo=1&dataType=JSON&base_date=${baseDate}&base_time=${baseTime}&nx=${posX}&ny=${posY}")
+            .uri("$govShortTermEndpoint/getVilageFcst?serviceKey=${govApiKey}&numOfRows=1000&pageNo=1&dataType=JSON&base_date=${baseDate}&base_time=${baseTime}&nx=${posX}&ny=${posY}")
             .retrieve()
             .bodyToMono(GovernmentPublicAPIResponse::class.java)
     }
