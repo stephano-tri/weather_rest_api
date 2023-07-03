@@ -1,7 +1,7 @@
 package eom.tri.weather.service
 
 import eom.tri.weather.controller.WeatherController
-import eom.tri.weather.model.GovernmentAPI.Address
+import eom.tri.weather.model.Address
 import eom.tri.weather.model.GovernmentAPI.GovernmentPublicAPIResponse
 import eom.tri.weather.persistence.LocationMidRepository
 import eom.tri.weather.persistence.LocationShortEntity
