@@ -32,7 +32,7 @@ class RequestService {
             .retrieve()
             .bodyToMono(GovernmentPublicAPIResponse::class.java)
             .onErrorResume {
-                println("error: ${it.message}")
+                println("error occur in $posX $posY: ${it.message}")
                 Mono.empty()
             }
     }
@@ -50,7 +50,7 @@ class RequestService {
             .retrieve()
             .bodyToMono(GovernmentPublicAPIMidResponse::class.java)
             .onErrorResume {
-                println("error: ${it.message}")
+                println("error occur in ${locationId}: ${it.message} ")
                 Mono.empty()
             }
     }
@@ -68,7 +68,7 @@ class RequestService {
             .retrieve()
             .bodyToMono(GovernmentPublicAPIMidTmpResponse::class.java)
             .onErrorResume {
-                println("error: ${it.message}")
+                println("error occur in ${locationId}: ${it.message} ")
                 Mono.empty()
             }
     }
