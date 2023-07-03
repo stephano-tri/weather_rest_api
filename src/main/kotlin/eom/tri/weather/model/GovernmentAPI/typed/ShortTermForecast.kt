@@ -1,4 +1,4 @@
-package eom.tri.weather.model.GovernmentAPI
+package eom.tri.weather.model.GovernmentAPI.typed
 
 import com.fasterxml.jackson.annotation.JsonProperty
 

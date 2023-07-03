@@ -1,13 +1,16 @@
 package eom.tri.weather.service
 
+import eom.tri.weather.model.GovernmentAPI.GovernmentPublicAPIResponse
 import eom.tri.weather.persistence.LocationShortRepository
 import eom.tri.weather.persistence.ShortTermForecastEntity
 import eom.tri.weather.persistence.ShortTermForecastRepository
 import eom.tri.weather.util.UtilFunction
+import jakarta.annotation.PostConstruct
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toMono
@@ -24,10 +27,11 @@ class WeatherDataCollectingService(
 
     /**
      * @author stephano-tri
-     * @description 발표일 , 발표시각, 예보지점의 X,Y 좌표를 통해 조회 한 후 없으면 DB에 저장합니다.
+     * @description 발표일 , 발표시각, 예보지점의 X,Y 좌표를 통해 조회 한 후 DB에 저장합니다.(단기 예보)
      */
 
-    @Scheduled(fixedDelay = 100000)
+    @PostConstruct
+    @Transactional
     fun collectWeatherData() {
         val fixedBaseDate = utilFunctions.toDateStr(LocalDateTime.now(), "yyyyMMdd")
         val fixedBaseTime = "0200"
@@ -37,28 +41,56 @@ class WeatherDataCollectingService(
                 Mono.zip(it.posX.toMono() , it.posY.toMono())
             }
             .flatMap {
-                requestService.getShortTermWeatherForecast(fixedBaseDate, fixedBaseTime, it.t1, it.t2)
+                requestService.getShortTermWeatherForecast(fixedBaseDate, fixedBaseTime, it.t1, it.t2, 200)
                     .flatMap { res ->
-                        Flux.fromIterable(res.response.body.items.item)
-                            .flatMap { forecast ->
-                                ShortTermForecastEntity(
-                                    baseDate = forecast.baseDate,
-                                    baseTime = forecast.baseTime,
-                                    fcstDate = forecast.fcstDate,
-                                    fcstTime = forecast.fcstTime,
-                                    nx = forecast.nx,
-                                    ny = forecast.ny,
-                                    category = forecast.category,
-                                    fcstValue = forecast.fcstValue,
-                                ).toMono()
-                            }
-                            .collectList()
-                            .flatMap {
-                                shortTermForecastRepository.saveAll(it).collectList()
-                            }
+                        saveShortTermForecast(res)
                     }
             }
             .subscribe()
+    }
+
+    /**
+     * @author stephano-tri
+     * @description 발표일 , 발표시각, 예보지점의 Code를 통하여 조회 한 후 DB에 저장합니다.(중기 예보)
+     */
+
+    @PostConstruct
+    @Transactional
+    fun collectMidWeatherData() {
+
+
+    }
+
+    /**
+     * @author stephano-tri
+     * @description 해당 날짜의 날씨를 조회하고 없을 경우 공공API에서 조회하여 DB에 저장합니다.
+     */
+
+    private fun collectingWeatherDataForNFE(fcstDate: String, nx: Int, ny: Int) {
+        requestService.getShortTermWeatherForecast(fcstDate, "0200", nx, ny, 200)
+            .flatMap { res -> saveShortTermForecast(res) }
+            .subscribe()
+    }
+
+    private fun saveShortTermForecast(govData: GovernmentPublicAPIResponse) : Mono<MutableList<ShortTermForecastEntity>> {
+        return Flux.fromIterable(govData.response.body.items.item)
+                    .flatMap { forecast ->
+                        ShortTermForecastEntity(
+                            baseDate=forecast.baseDate,
+                            baseTime=forecast.baseTime,
+                            fcstDate=forecast.fcstDate,
+                            fcstTime=forecast.fcstTime,
+                            nx=forecast.nx,
+                            ny=forecast.ny,
+                            category=forecast.category,
+                            fcstValue=forecast.fcstValue,
+                        ).toMono()
+                    }
+                    .collectList()
+                    .flatMap { shortTermFcsts ->
+                        shortTermForecastRepository.saveAll(shortTermFcsts)
+                            .collectList()
+                    }
     }
 
     private fun shortTermCategoryConverter(category: String): String {
