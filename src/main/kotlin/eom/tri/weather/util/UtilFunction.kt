@@ -12,4 +12,9 @@ class UtilFunction {
         return dateFormat.format(Date(epochMillis))
     }
 
+    fun toDateStr(localDateTime: java.time.LocalDateTime, format: String): String {
+        return SimpleDateFormat(format)
+            .format(java.sql.Timestamp.valueOf(localDateTime))
+    }
+
 }
