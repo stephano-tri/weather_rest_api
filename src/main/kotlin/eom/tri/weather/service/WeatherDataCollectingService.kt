@@ -61,12 +61,26 @@ class WeatherDataCollectingService(
 
     }
 
+
+    /**
+     * @author stephano-tri
+     * @description 발표일 , 발표시각, 예보지점의 Code를 통하여 조회 한 후 DB에 저장합니다.(중기 온도 예보)
+     */
+
+    @PostConstruct
+    @Transactional
+    fun collectMidTemperatureWeatherData() {
+
+
+    }
+
+
     /**
      * @author stephano-tri
      * @description 해당 날짜의 날씨를 조회하고 없을 경우 공공API에서 조회하여 DB에 저장합니다.
      */
 
-    private fun collectingWeatherDataForNFE(fcstDate: String, nx: Int, ny: Int) {
+    private fun getWeatherDataForNFE(fcstDate: String, nx: Int, ny: Int) {
         requestService.getShortTermWeatherForecast(fcstDate, "0200", nx, ny, 200)
             .flatMap { res -> saveShortTermForecast(res) }
             .subscribe()
