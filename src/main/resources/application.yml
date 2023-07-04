@@ -14,7 +14,6 @@ logging:
 
 gov:
   api:
-    short_term_url: https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0
-    mid_term_url: https://apis.data.go.kr/1360000/MidFcstInfoService
-    key: DZSo8r1Wa2HpQdHAhqyCdELjAfBDOoTTqcPzrU6Osv0aHXGSpkK0K1WlfwBzaRoUA70qX02i%2BMHPZ51aGobL5Q%3D%3D
+    url: https://apis.data.go.kr/1360000
+    key: your_own_key
 

@@ -12,10 +12,8 @@ import reactor.core.publisher.Mono
 
 @Service
 class RequestService {
-    @Value("\${gov.api.short_term_url}")
-    var govShortTermEndpoint: String? = null
-    @Value("\${gov.api.mid_term_url}")
-    var govMidTermEndpoint: String? = null
+    @Value("\${gov.api.url}")
+    var govEndpoint: String? = null
     @Value("\${gov.api.key}")
     val govApiKey: String? = null
 
@@ -27,7 +25,7 @@ class RequestService {
             .uriBuilderFactory(buildFactory)
             .build()
             .get()
-            .uri("$govShortTermEndpoint/getVilageFcst?serviceKey=${govApiKey}&numOfRows=${totalRows ?: 1000}&pageNo=1&dataType=JSON&base_date=${baseDate}&base_time=${baseTime}&nx=${posX}&ny=${posY}")
+            .uri("$govEndpoint/VilageFcstInfoService_2.0/getVilageFcst?serviceKey=${govApiKey}&numOfRows=${totalRows ?: 1000}&pageNo=1&dataType=JSON&base_date=${baseDate}&base_time=${baseTime}&nx=${posX}&ny=${posY}")
             .accept(org.springframework.http.MediaType.APPLICATION_JSON)
             .retrieve()
             .bodyToMono(GovernmentPublicAPIResponse::class.java)
@@ -45,7 +43,7 @@ class RequestService {
             .uriBuilderFactory(buildFactory)
             .build()
             .get()
-            .uri("$govMidTermEndpoint/MidFcstInfoService/getMidLandFcst?serviceKey=${govApiKey}&numOfRows=10&pageNo=1&regId=${locationId}&tmFc=${announceDate}")
+            .uri("$govEndpoint/MidFcstInfoService/getMidLandFcst?serviceKey=${govApiKey}&numOfRows=10&pageNo=1&dataType=JSON&regId=${locationId}&tmFc=${announceDate}")
             .accept(org.springframework.http.MediaType.APPLICATION_JSON)
             .retrieve()
             .bodyToMono(GovernmentPublicAPIMidResponse::class.java)
@@ -63,7 +61,7 @@ class RequestService {
             .uriBuilderFactory(buildFactory)
             .build()
             .get()
-            .uri("$govMidTermEndpoint/MidFcstInfoService/getMidTa?serviceKey=${govApiKey}&numOfRows=10&pageNo=1&regId=${locationId}&tmFc=${announceDate}")
+            .uri("$govEndpoint/MidFcstInfoService/getMidTa?serviceKey=${govApiKey}&numOfRows=10&pageNo=1&dataType=JSON&regId=${locationId}&tmFc=${announceDate}")
             .accept(org.springframework.http.MediaType.APPLICATION_JSON)
             .retrieve()
             .bodyToMono(GovernmentPublicAPIMidTmpResponse::class.java)
