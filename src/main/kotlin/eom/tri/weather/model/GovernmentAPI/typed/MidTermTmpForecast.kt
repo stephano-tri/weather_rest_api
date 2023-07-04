@@ -3,6 +3,7 @@ package eom.tri.weather.model.GovernmentAPI.typed
 import com.fasterxml.jackson.annotation.JsonProperty
 
 data class MidTermTmpForecast(
+    @field:JsonProperty("regId") val regId: String,
     @field:JsonProperty("taMin3") val taMin3: String,
     @field:JsonProperty("taMin3Low") val taMin3Low: String,
     @field:JsonProperty("taMin3High") val taMin3High: String,
@@ -51,5 +52,4 @@ data class MidTermTmpForecast(
     @field:JsonProperty("taMax10") val taMax10: String,
     @field:JsonProperty("taMax10Low") val taMax10Low: String,
     @field:JsonProperty("taMax10High") val taMax10High: String,
-
 )
