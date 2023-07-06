@@ -1,9 +1,11 @@
 package eom.tri.weather.service
 
 import eom.tri.weather.controller.WeatherController
+import eom.tri.weather.exception.InvalidInputException
 import eom.tri.weather.model.Address
 import eom.tri.weather.model.GovernmentAPI.GovernmentPublicAPIResponse
 import eom.tri.weather.persistence.LocationMidRepository
+import eom.tri.weather.persistence.LocationMidTempRepository
 import eom.tri.weather.persistence.LocationShortEntity
 import eom.tri.weather.persistence.LocationShortRepository
 import eom.tri.weather.util.UtilFunction
@@ -18,6 +20,7 @@ import java.time.LocalDateTime
 class WeatherControllerImpl(
     private val locationShortRepository : LocationShortRepository,
     private val locationMidRepository : LocationMidRepository,
+    private val locationMidTempRepository : LocationMidTempRepository,
     private val requestService : RequestService,
     private val utilFunctions : UtilFunction,
 ) : WeatherController {
@@ -40,6 +43,10 @@ class WeatherControllerImpl(
             }
     }
 
+    override fun getMidTermForecast(type : String, regionCode : String) : Mono<GovernmentPublicAPIResponse> {
+        TODO("Not yet implemented")
+    }
+
     override fun searchAddress(type: String, regionName : String) : Mono<List<Address>> {
         return if(type == "short") {
             locationShortRepository.findAllByFirstLocLike("%${regionName}%")
@@ -52,7 +59,7 @@ class WeatherControllerImpl(
                     ).toMono()
                 }
                 .collectList()
-        } else {
+        } else if(type == "mid"){
             locationMidRepository.findAllByNameLike("%${regionName}%")
                 .flatMap { loc ->
                     Address(
@@ -61,6 +68,17 @@ class WeatherControllerImpl(
                     ).toMono()
                 }
                 .collectList()
+        } else if(type == "mid_temp") {
+            locationMidTempRepository.findAllByNameLike("%${regionName}")
+                .flatMap { loc ->
+                    Address(
+                        regionName = loc.name,
+                        regionCode = loc.code,
+                    ).toMono()
+                }
+                .collectList()
+        } else {
+            InvalidInputException("type is not valid (short , mid , mid_temp only)").toMono()
         }
     }
 
