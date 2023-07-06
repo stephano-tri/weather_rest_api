@@ -47,11 +47,7 @@ class WeatherControllerImpl(
             .flatMap {
                 shortTermForecastRepository.findAllByFcstDateAndNxAndNy(today, it.t1, it.t2)
                     .flatMap { shortTermForecastEn ->
-                        ShortForecast(
-                            fcstTime = shortTermForecastEn.fcstTime!!,
-                            category = shortTermForecastEn.category!!,
-                            fcstValue = shortTermForecastEn.fcstValue!!
-                        ).toMono()
+                        shortTermForecastEn.cast2ShortTermPojo()
                     }.collectList()
             }
     }
@@ -62,7 +58,7 @@ class WeatherControllerImpl(
 
         val searchMidtermForecast = midTermForecastRepository.findAllByRegIdAndRefDate(regionCode, refDate = today + fixedTime)
             .flatMap { midTermForecastEn ->
-                cast2MidForecastPojo(midTermForecastEn)
+                midTermForecastEn.cast2MidForecastPojo()
             }
 
         return searchMidtermForecast.elementAt(0)
@@ -72,9 +68,12 @@ class WeatherControllerImpl(
         val today = utilFunctions.toDateStr(LocalDateTime.now(), "yyyyMMdd")
         val fixedTime = "0600"
 
+        logger.debug("on...")
+        logger.info("off...")
+
         val searchMidTermTemperatureForecast = midTermForecastTempRepository.findAllByRegIdAndRefDate(regionCode, refDate = today + fixedTime)
             .flatMap { midTermForecastTempEn ->
-                cast2MidForecastTemperaturePojo(midTermForecastTempEn)
+                midTermForecastTempEn.cast2MidForecastTemperaturePojo()
             }
 
         return searchMidTermTemperatureForecast.elementAt(0)
@@ -119,93 +118,101 @@ class WeatherControllerImpl(
         return loc.firstLoc + (loc.secondLoc?.let { " " + it + (loc.thirdLoc?. let { " $it" } ?: run { "" })} ?: run { "" } )
     }
 
-    private fun cast2MidForecastPojo(midTermForecastEn: MidTermForecastEntity) : Mono<MidForecast> =
+    private fun ShortTermForecastEntity.cast2ShortTermPojo(): Mono<ShortForecast> {
+        return ShortForecast(
+            fcstTime = this.fcstTime!!,
+            category = this.category!!,
+            fcstValue = this.fcstValue!!
+        ).toMono()
+    }
+
+    private fun MidTermForecastEntity.cast2MidForecastPojo() : Mono<MidForecast> =
         MidForecast(
-            regId = midTermForecastEn.regId!!,
-            rnSt3Am = midTermForecastEn.rnSt3Am!!,
-            rnSt3Pm = midTermForecastEn.rnSt3Pm!!,
-            rnSt4Am = midTermForecastEn.rnSt4Am!!,
-            rnSt4Pm = midTermForecastEn.rnSt4Pm!!,
-            rnSt5Am = midTermForecastEn.rnSt5Am!!,
-            rnSt5Pm = midTermForecastEn.rnSt5Pm!!,
-            rnSt6Am = midTermForecastEn.rnSt6Am!!,
-            rnSt6Pm = midTermForecastEn.rnSt6Pm!!,
-            rnSt7Am = midTermForecastEn.rnSt7Am!!,
-            rnSt7Pm = midTermForecastEn.rnSt7Pm!!,
-            rnSt8 = midTermForecastEn.rnSt8!!,
-            rnSt9 = midTermForecastEn.rnSt9!!,
-            rnSt10 = midTermForecastEn.rnSt10!!,
-            wf3Am = midTermForecastEn.wf3Am!!,
-            wf3Pm = midTermForecastEn.wf3Pm!!,
-            wf4Am = midTermForecastEn.wf4Am!!,
-            wf4Pm = midTermForecastEn.wf4Pm!!,
-            wf5Am = midTermForecastEn.wf5Am!!,
-            wf5Pm = midTermForecastEn.wf5Pm!!,
-            wf6Am = midTermForecastEn.wf6Am!!,
-            wf6Pm = midTermForecastEn.wf6Pm!!,
-            wf7Am = midTermForecastEn.wf7Am!!,
-            wf7Pm = midTermForecastEn.wf7Pm!!,
-            wf8 = midTermForecastEn.wf8!!,
-            wf9 = midTermForecastEn.wf9!!,
-            wf10 = midTermForecastEn.wf10!!,
-            refDate = midTermForecastEn.refDate!!,
-            id = midTermForecastEn.id
+            regId = this.regId!!,
+            rnSt3Am = this.rnSt3Am!!,
+            rnSt3Pm = this.rnSt3Pm!!,
+            rnSt4Am = this.rnSt4Am!!,
+            rnSt4Pm = this.rnSt4Pm!!,
+            rnSt5Am = this.rnSt5Am!!,
+            rnSt5Pm = this.rnSt5Pm!!,
+            rnSt6Am = this.rnSt6Am!!,
+            rnSt6Pm = this.rnSt6Pm!!,
+            rnSt7Am = this.rnSt7Am!!,
+            rnSt7Pm = this.rnSt7Pm!!,
+            rnSt8 = this.rnSt8!!,
+            rnSt9 = this.rnSt9!!,
+            rnSt10 = this.rnSt10!!,
+            wf3Am = this.wf3Am!!,
+            wf3Pm = this.wf3Pm!!,
+            wf4Am = this.wf4Am!!,
+            wf4Pm = this.wf4Pm!!,
+            wf5Am = this.wf5Am!!,
+            wf5Pm = this.wf5Pm!!,
+            wf6Am = this.wf6Am!!,
+            wf6Pm = this.wf6Pm!!,
+            wf7Am = this.wf7Am!!,
+            wf7Pm = this.wf7Pm!!,
+            wf8 = this.wf8!!,
+            wf9 = this.wf9!!,
+            wf10 = this.wf10!!,
+            refDate = this.refDate!!,
+            id = this.id
         ).toMono()
 
 
-    private fun cast2MidForecastTemperaturePojo(midTermForecastTempEn: MidTermForecastTempEntity) : Mono<MidTemperatureForecast> =
+    private fun MidTermForecastTempEntity.cast2MidForecastTemperaturePojo() : Mono<MidTemperatureForecast> =
         MidTemperatureForecast(
-            id = midTermForecastTempEn.id,
-            regId = midTermForecastTempEn.regId,
-            refDate = midTermForecastTempEn.refDate,
-            taMin3 = midTermForecastTempEn.taMin_3,
-            taMin3Low = midTermForecastTempEn.taMin_3Low,
-            taMin3High = midTermForecastTempEn.taMax_3High,
-            taMax3 = midTermForecastTempEn.taMax_3,
-            taMax3Low = midTermForecastTempEn.taMax_3Low,
-            taMax3High = midTermForecastTempEn.taMax_3High,
-            taMin4 = midTermForecastTempEn.taMin_4,
-            taMin4Low = midTermForecastTempEn.taMin_4Low,
-            taMin4High = midTermForecastTempEn.taMin_4High,
-            taMax4 = midTermForecastTempEn.taMax_4,
-            taMax4Low = midTermForecastTempEn.taMax_4Low,
-            taMax4High = midTermForecastTempEn.taMax_4High,
-            taMin5 = midTermForecastTempEn.taMin_5,
-            taMin5Low = midTermForecastTempEn.taMin_5Low,
-            taMin5High = midTermForecastTempEn.taMin_5High,
-            taMax5 = midTermForecastTempEn.taMax_5,
-            taMax5Low = midTermForecastTempEn.taMax_5Low,
-            taMax5High = midTermForecastTempEn.taMax_5High,
-            taMin6 = midTermForecastTempEn.taMin_6,
-            taMin6Low = midTermForecastTempEn.taMin_6Low,
-            taMin6High = midTermForecastTempEn.taMin_6High,
-            taMax6 = midTermForecastTempEn.taMax_6,
-            taMax6Low = midTermForecastTempEn.taMax_6Low,
-            taMax6High = midTermForecastTempEn.taMax_6High,
-            taMin7 = midTermForecastTempEn.taMin_7,
-            taMin7Low = midTermForecastTempEn.taMin_7Low,
-            taMin7High = midTermForecastTempEn.taMin_7High,
-            taMax7 = midTermForecastTempEn.taMax_7,
-            taMax7Low = midTermForecastTempEn.taMax_7Low,
-            taMax7High = midTermForecastTempEn.taMax_7High,
-            taMin8 = midTermForecastTempEn.taMin_8,
-            taMin8Low = midTermForecastTempEn.taMin_8Low,
-            taMin8High = midTermForecastTempEn.taMin_8High,
-            taMax8 = midTermForecastTempEn.taMax_8,
-            taMax8Low = midTermForecastTempEn.taMax_8Low,
-            taMax8High = midTermForecastTempEn.taMax_8High,
-            taMin9 = midTermForecastTempEn.taMin_9,
-            taMin9Low = midTermForecastTempEn.taMin_9Low,
-            taMin9High = midTermForecastTempEn.taMin_9High,
-            taMax9 = midTermForecastTempEn.taMax_9,
-            taMax9Low = midTermForecastTempEn.taMax_9Low,
-            taMax9High = midTermForecastTempEn.taMax_9High,
-            taMin10 = midTermForecastTempEn.taMin_10,
-            taMin10Low = midTermForecastTempEn.taMin_10Low,
-            taMin10High = midTermForecastTempEn.taMin_10High,
-            taMax10 = midTermForecastTempEn.taMax_10,
-            taMax10Low = midTermForecastTempEn.taMax_10Low,
-            taMax10High = midTermForecastTempEn.taMax_10High,
+            id = this.id,
+            regId = this.regId,
+            refDate = this.refDate,
+            taMin3 = this.taMin_3,
+            taMin3Low = this.taMin_3Low,
+            taMin3High = this.taMax_3High,
+            taMax3 = this.taMax_3,
+            taMax3Low = this.taMax_3Low,
+            taMax3High = this.taMax_3High,
+            taMin4 = this.taMin_4,
+            taMin4Low = this.taMin_4Low,
+            taMin4High = this.taMin_4High,
+            taMax4 = this.taMax_4,
+            taMax4Low = this.taMax_4Low,
+            taMax4High = this.taMax_4High,
+            taMin5 = this.taMin_5,
+            taMin5Low = this.taMin_5Low,
+            taMin5High = this.taMin_5High,
+            taMax5 = this.taMax_5,
+            taMax5Low = this.taMax_5Low,
+            taMax5High = this.taMax_5High,
+            taMin6 = this.taMin_6,
+            taMin6Low = this.taMin_6Low,
+            taMin6High = this.taMin_6High,
+            taMax6 = this.taMax_6,
+            taMax6Low = this.taMax_6Low,
+            taMax6High = this.taMax_6High,
+            taMin7 = this.taMin_7,
+            taMin7Low = this.taMin_7Low,
+            taMin7High = this.taMin_7High,
+            taMax7 = this.taMax_7,
+            taMax7Low = this.taMax_7Low,
+            taMax7High = this.taMax_7High,
+            taMin8 = this.taMin_8,
+            taMin8Low = this.taMin_8Low,
+            taMin8High = this.taMin_8High,
+            taMax8 = this.taMax_8,
+            taMax8Low = this.taMax_8Low,
+            taMax8High = this.taMax_8High,
+            taMin9 = this.taMin_9,
+            taMin9Low = this.taMin_9Low,
+            taMin9High = this.taMin_9High,
+            taMax9 = this.taMax_9,
+            taMax9Low = this.taMax_9Low,
+            taMax9High = this.taMax_9High,
+            taMin10 = this.taMin_10,
+            taMin10Low = this.taMin_10Low,
+            taMin10High =this.taMin_10High,
+            taMax10 = this.taMax_10,
+            taMax10Low = this.taMax_10Low,
+            taMax10High = this.taMax_10High,
         ).toMono()
 
 }

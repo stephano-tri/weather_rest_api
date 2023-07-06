@@ -23,6 +23,13 @@ ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'stephano-tri';
 
 ### DB Schema
 
+### Spring Boot log read(file system)
+
+```
+docker exec -it {container_id} bin/bash
+tail -f logs/my-app.log
+```
+
 ### API Docs
 ```
 Notion Links
