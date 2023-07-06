@@ -1,3 +1,6 @@
 package eom.tri.weather.model
 
-data class MidForecast()
+data class MidForecast(
+
+
+)

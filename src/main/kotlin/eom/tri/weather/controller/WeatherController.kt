@@ -2,6 +2,8 @@ package eom.tri.weather.controller
 
 import eom.tri.weather.model.Address
 import eom.tri.weather.model.GovernmentAPI.GovernmentPublicAPIResponse
+import eom.tri.weather.model.MidForecast
+import eom.tri.weather.model.MidTemperatureForecast
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestParam
 import reactor.core.publisher.Mono
@@ -23,15 +25,24 @@ interface WeatherController {
     /**
      * @author stephano-tri
      * @description 중기예보를 조회합니다.
-     * @param type 검색할 주소의 타입입니다. mid, mid-temp 중 하나를 입력해야 합니다 (mid 중기예보 , mid-temp 중기기온 예보)
-     *        regionCode 검색할 지역의 코드입니다. (ex: searchAddress를 통해 얻은 code를 입력해주세요.)
+     * @param regionCode 검색할 지역의 코드입니다. (ex: searchAddress를 통해 얻은 code를 입력해주세요.)
      */
     @GetMapping(
-        path = ["/api/v1/midTerm/forecast/load"],
+        path = ["/api/v1/midterm/forecast/load"],
         produces = ["application/json"]
     )
-    fun getMidTermForecast(@RequestParam("type") type: String,
-                           @RequestParam("regionCode") regionCode: String) : Mono<GovernmentPublicAPIResponse>
+    fun getMidTermForecast(@RequestParam("regionCode") regionCode: String) : Mono<MidForecast>
+
+    /**
+     * @author stephano-tri
+     * @description 중기예보(기온)을 조회합니다.
+     * @param regionCode 검색할 지역의 코드입니다. (ex: searchAddress를 통해 얻은 code를 입력해주세요.)
+     */
+    @GetMapping(
+        path = ["/api/v1/midterm/temperature/forecast/load"],
+        produces = ["application/json"]
+    )
+    fun getMidTermForecastTemp(@RequestParam("regionCode") regionCode: String) : Mono<MidTemperatureForecast>
 
     /**
      * @author stephano-tri

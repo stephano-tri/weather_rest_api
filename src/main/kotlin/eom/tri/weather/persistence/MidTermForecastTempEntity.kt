@@ -8,7 +8,7 @@ data class MidTermForecastTempEntity (
     @Id
     val id: Long? = null,
     val regId: String,
-    val regDate: String,
+    val refDate: String,
     val taMin3: String,
     val taMin3Low: String,
     val taMin3High: String,
