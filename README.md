@@ -19,6 +19,8 @@ _**remember this project need JAVA17 !!**_
 ```
 
 ## DB Install
+_**db_password -> stephano-tri(infer docker-compose.yml)**_
+
 ```
 docker exec -it mysql bin/bash
 mysql -uroot -p --port 3306 < init.sql
@@ -45,8 +47,6 @@ SpringBoot(log4j2)를 통하여 로그를 수집합니다(-> FILESYSTEM)
 ```
 docker exec -it weather-service bin/bash
 tail -f logs/weather-service.log
-
-db_password -> stephano-tri(infer docker-compose.yml)
 ```
 
 ### Request log(only failed request collect)
