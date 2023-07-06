@@ -4,6 +4,7 @@ import eom.tri.weather.model.Address
 import eom.tri.weather.model.GovernmentAPI.GovernmentPublicAPIResponse
 import eom.tri.weather.model.MidForecast
 import eom.tri.weather.model.MidTemperatureForecast
+import eom.tri.weather.model.ShortForecast
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestParam
 import reactor.core.publisher.Mono
@@ -19,7 +20,7 @@ interface WeatherController {
         path = ["/api/v1/today/forecast/load"],
         produces = ["application/json"]
     )
-    fun getTodayForecast(@RequestParam("regionCode") regionCode: String) : Mono<GovernmentPublicAPIResponse>
+    fun getTodayForecast(@RequestParam("regionCode") regionCode: String) : Mono<List<ShortForecast>>
 
 
     /**

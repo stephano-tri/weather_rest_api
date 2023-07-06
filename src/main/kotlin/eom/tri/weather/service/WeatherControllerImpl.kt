@@ -7,6 +7,7 @@ import eom.tri.weather.model.GovernmentAPI.GovernmentPublicAPIMidResponse
 import eom.tri.weather.model.GovernmentAPI.GovernmentPublicAPIResponse
 import eom.tri.weather.model.MidForecast
 import eom.tri.weather.model.MidTemperatureForecast
+import eom.tri.weather.model.ShortForecast
 import eom.tri.weather.persistence.*
 import eom.tri.weather.util.UtilFunction
 import org.slf4j.Logger
@@ -21,6 +22,7 @@ class WeatherControllerImpl(
     private val locationShortRepository : LocationShortRepository,
     private val locationMidRepository : LocationMidRepository,
     private val locationMidTempRepository : LocationMidTempRepository,
+    private val shortTermForecastRepository : ShortTermForecastRepository,
     private val midTermForecastRepository : MidTermForecastRepository,
     private val midTermForecastTempRepository : MidTermForecastTempRepository,
     private val requestService : RequestService,
@@ -28,7 +30,7 @@ class WeatherControllerImpl(
 ) : WeatherController {
     val logger: Logger= LoggerFactory.getLogger(WeatherControllerImpl::class.java)
 
-    override fun getTodayForecast(regionCode : String) : Mono<GovernmentPublicAPIResponse> {
+    override fun getTodayForecast(regionCode : String) : Mono<List<ShortForecast>> {
         //option for today forecast
         val today = utilFunctions.toDateStr(LocalDateTime.now(), "yyyyMMdd")
         val fixedTime = "0200"
@@ -41,7 +43,14 @@ class WeatherControllerImpl(
 
         return searchCoordinateByRegionCode
             .flatMap {
-                requestService.getShortTermWeatherForecast(baseDate = today, baseTime = fixedTime, posX = it.t1 , posY = it.t2)
+                shortTermForecastRepository.findAllByFcstDateAndNxAndNy(today, it.t1, it.t2)
+                    .flatMap { shortTermForecastEn ->
+                        ShortForecast(
+                            fcstTime = shortTermForecastEn.fcstTime!!,
+                            category = shortTermForecastEn.category!!,
+                            fcstValue = shortTermForecastEn.fcstValue!!
+                        ).toMono()
+                    }.collectList()
             }
     }
 
@@ -50,12 +59,15 @@ class WeatherControllerImpl(
 
         val searchMidtermForecast = midTermForecastRepository.findAllByRegIdAndRefDate(regionCode, refDate = today)
 
+        TODO("Not yet implemented")
     }
 
     override fun getMidTermForecastTemp(regionCode : String) : Mono<MidTemperatureForecast> {
         val today = utilFunctions.toDateStr(LocalDateTime.now(), "yyyyMMdd")
 
         val searchMidTermTemperatureForecast = midTermForecastTempRepository.findAllByRegIdAndRefDate(regionCode, refDate = today)
+
+        TODO("Not yet implemented")
     }
 
     override fun searchAddress(type: String, regionName : String) : Mono<List<Address>> {
