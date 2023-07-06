@@ -13,9 +13,11 @@ services:
       - --collation-server=utf8mb4_unicode_ci
       - --default-authentication-plugin=mysql_native_password
     volumes:
-      - /Users/eomjihwan/mysql:/var/lib/mysql
+      - ./schema/:/docker-entrypoint-initdb.d
+#      - /Users/eomjihwan/mysql:/var/lib/mysql
 
   elasticsearch:
+    container_name: elasticsearch
     image: elasticsearch
     mem_limit: 2g
     environment:
@@ -26,8 +28,8 @@ services:
       memlock:
         soft: -1
         hard: -1
-    volumes:
-      - /Users/eomjihwan/ES:/usr/share/elasticsearch/data
+#    volumes:
+#      - /Users/eomjihwan/ES:/usr/share/elasticsearch/data
     ports:
       - "9200:9200"
     healthcheck:
@@ -36,7 +38,8 @@ services:
       timeout: 10s
       retries: 5
 
-  weather-service:
+  weather:
+    container_name: weather-service
     build: .
     ports:
       - "8080:8080"

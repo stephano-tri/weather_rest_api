@@ -3,10 +3,6 @@ package eom.tri.weather.service
 import eom.tri.weather.controller.WeatherController
 import eom.tri.weather.exception.InvalidInputException
 import eom.tri.weather.model.Address
-import eom.tri.weather.model.GovernmentAPI.GovernmentPublicAPIMidResponse
-import eom.tri.weather.model.GovernmentAPI.GovernmentPublicAPIResponse
-import eom.tri.weather.model.GovernmentAPI.typed.MidTermForecast
-import eom.tri.weather.model.GovernmentAPI.typed.MidTermTmpForecast
 import eom.tri.weather.model.MidForecast
 import eom.tri.weather.model.MidTemperatureForecast
 import eom.tri.weather.model.ShortForecast
@@ -35,7 +31,6 @@ class WeatherControllerImpl(
     override fun getTodayForecast(regionCode : String) : Mono<List<ShortForecast>> {
         //option for today forecast
         val today = utilFunctions.toDateStr(LocalDateTime.now(), "yyyyMMdd")
-        val fixedTime = "0200"
 
         // find pos_x , pos_y by regionCode(adminDivCode)
         val searchCoordinateByRegionCode = locationShortRepository.findAllByAdminDivCode(regionCode)
@@ -67,9 +62,6 @@ class WeatherControllerImpl(
     override fun getMidTermForecastTemp(regionCode : String) : Mono<MidTemperatureForecast> {
         val today = utilFunctions.toDateStr(LocalDateTime.now(), "yyyyMMdd")
         val fixedTime = "0600"
-
-        logger.debug("on...")
-        logger.info("off...")
 
         val searchMidTermTemperatureForecast = midTermForecastTempRepository.findAllByRegIdAndRefDate(regionCode, refDate = today + fixedTime)
             .flatMap { midTermForecastTempEn ->

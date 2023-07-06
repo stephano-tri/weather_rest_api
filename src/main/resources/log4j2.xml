@@ -5,7 +5,7 @@
     </Properties>
     <Appenders>
         <!-- File Appender -->
-        <File name="FILE" fileName="${basePath}/my-app.log" append="true">
+        <File name="FILE" fileName="${basePath}/weather-service.log" append="true">
             <PatternLayout pattern="%-5p | %d{yyyy-MM-dd HH:mm:ss} | [%t] %C{2} (%F:%L) - %m%n" />
         </File>
         <!-- Console Appender -->
