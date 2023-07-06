@@ -3,11 +3,9 @@ package eom.tri.weather.service
 import eom.tri.weather.controller.WeatherController
 import eom.tri.weather.exception.InvalidInputException
 import eom.tri.weather.model.Address
+import eom.tri.weather.model.GovernmentAPI.GovernmentPublicAPIMidResponse
 import eom.tri.weather.model.GovernmentAPI.GovernmentPublicAPIResponse
-import eom.tri.weather.persistence.LocationMidRepository
-import eom.tri.weather.persistence.LocationMidTempRepository
-import eom.tri.weather.persistence.LocationShortEntity
-import eom.tri.weather.persistence.LocationShortRepository
+import eom.tri.weather.persistence.*
 import eom.tri.weather.util.UtilFunction
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -21,6 +19,7 @@ class WeatherControllerImpl(
     private val locationShortRepository : LocationShortRepository,
     private val locationMidRepository : LocationMidRepository,
     private val locationMidTempRepository : LocationMidTempRepository,
+    private val midTermForecastRepository : MidTermForecastRepository,
     private val requestService : RequestService,
     private val utilFunctions : UtilFunction,
 ) : WeatherController {
@@ -43,8 +42,12 @@ class WeatherControllerImpl(
             }
     }
 
-    override fun getMidTermForecast(type : String, regionCode : String) : Mono<GovernmentPublicAPIResponse> {
-        TODO("Not yet implemented")
+    override fun getMidTermForecast(type : String, regionCode : String) : Mono<GovernmentPublicAPIMidResponse> {
+        val today = utilFunctions.toDateStr(LocalDateTime.now(), "yyyyMMdd")
+
+        val searchMidtermForecast = midTermForecastRepository.findAllByRegIdAndRefDate(regionCode, refDate = today)
+
+
     }
 
     override fun searchAddress(type: String, regionName : String) : Mono<List<Address>> {

@@ -8,7 +8,6 @@ import reactor.core.publisher.Mono
 
 interface WeatherController {
 
-
     /**
      * @author stephano-tri
      * @description 단기예보를 조회합니다.
