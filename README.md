@@ -40,7 +40,7 @@ SpringBoot(log4j2)를 통하여 로그를 수집합니다(-> FILESYSTEM)
 
 ```
 
-### Spring Boot log read(file system)
+## Spring Boot log read(file system)
 
 ```
 docker exec -it weather-service bin/bash
@@ -49,7 +49,7 @@ tail -f logs/weather-service.log
 db_password -> stephano-tri(infer docker-compose.yml)
 ```
 
-### Request log(only failed request collect)
+## Request log read(only failed request collect)
 ```
 curl --location --request GET 'localhost:9200/request.log/_search'
 
@@ -58,7 +58,13 @@ OR
 localhost:9200/request.log/_search
 ```
 
-### DB diagram
+## DB Backup
+_**If you want to daily backup , use this command in cron, crontab**_
+```
+docker exec mysql bash -c 'exec mysqldump --databases "weather" -h mysql -u"root" -p"stephano-tri"' > gzip > backup/snapshot-001
+```
+
+## DB diagram
 ![image](https://github.com/stephano-tri/weather_rest_api/assets/62496713/c3c9df7b-89a9-460d-9bee-505db609ca7d)
 
 
