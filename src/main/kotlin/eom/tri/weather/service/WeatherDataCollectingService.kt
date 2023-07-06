@@ -33,8 +33,8 @@ class WeatherDataCollectingService(
      * @description 발표일 , 발표시각, 예보지점의 X,Y 좌표를 통해 조회 한 후 DB에 저장합니다.(단기 예보)
      */
 
-    @PostConstruct
-    @Transactional
+ /*   @PostConstruct
+    @Transactional*/
     fun collectWeatherData() {
         val fixedBaseDate = utilFunctions.toDateStr(LocalDateTime.now(), "yyyyMMdd")
         val fixedBaseTime = "0200"
@@ -57,8 +57,8 @@ class WeatherDataCollectingService(
      * @description 발표일 , 발표시각, 예보지점의 Code를 통하여 조회 한 후 DB에 저장합니다.(중기 예보)
      */
 
-    @PostConstruct
-    @Transactional
+    /*@PostConstruct
+    @Transactional*/
     fun collectMidWeatherData() {
         val fixedBaseDate = utilFunctions.toDateStr(LocalDateTime.now(), "yyyyMMdd")
         val fixedBaseTime = "0600"
@@ -81,8 +81,8 @@ class WeatherDataCollectingService(
      * @description 발표일 , 발표시각, 예보지점의 Code를 통하여 조회 한 후 DB에 저장합니다.(중기 온도 예보)
      */
 
-    @PostConstruct
-    @Transactional
+/*    @PostConstruct
+    @Transactional*/
     fun collectMidTemperatureWeatherData() {
         val fixedBaseDate = utilFunctions.toDateStr(LocalDateTime.now(), "yyyyMMdd")
         val fixedBaseTime = "0600"
@@ -94,6 +94,7 @@ class WeatherDataCollectingService(
             .flatMap { location ->
                 requestService.getMidTermTmpWeatherForecast(location, fixedBaseDate + fixedBaseTime)
                     .flatMap { res ->
+                        logger.debug("res : $res")
                         saveMidTermTempForecast(res, fixedBaseDate + fixedBaseTime)
                     }
             }.subscribe()
@@ -116,56 +117,56 @@ class WeatherDataCollectingService(
         return Flux.fromIterable(govData.response.body.items.item)
             .flatMap {
                 MidTermForecastTempEntity(
-                    regDate = refDate,
+                    refDate = refDate,
                     regId = it.regId,
-                    taMin3 = it.taMin3,
-                    taMin3Low = it.taMin3Low,
-                    taMin3High = it.taMin3High,
-                    taMax3 = it.taMax3,
-                    taMax3Low = it.taMax3Low,
-                    taMax3High = it.taMax3High,
-                    taMin4 = it.taMin4,
-                    taMin4Low = it.taMin4Low,
-                    taMin4High = it.taMin4High,
-                    taMax4 = it.taMax4,
-                    taMax4Low = it.taMax4Low,
-                    taMax4High = it.taMax4High,
-                    taMin5 = it.taMin5,
-                    taMin5Low = it.taMin5Low,
-                    taMin5High = it.taMin5High,
-                    taMax5 = it.taMax5,
-                    taMax5Low = it.taMax5Low,
-                    taMax5High = it.taMax5High,
-                    taMin6 = it.taMin6,
-                    taMin6Low = it.taMin6Low,
-                    taMin6High = it.taMin6High,
-                    taMax6 = it.taMax6,
-                    taMax6Low = it.taMax6Low,
-                    taMax6High = it.taMax6High,
-                    taMin7 = it.taMin7,
-                    taMin7Low = it.taMin7Low,
-                    taMin7High = it.taMin7High,
-                    taMax7 = it.taMax7,
-                    taMax7Low = it.taMax7Low,
-                    taMax7High = it.taMax7High,
-                    taMin8 = it.taMin8,
-                    taMin8Low = it.taMin8Low,
-                    taMin8High = it.taMin8High,
-                    taMax8 = it.taMax8,
-                    taMax8Low = it.taMax8Low,
-                    taMax8High = it.taMax8High,
-                    taMin9 = it.taMin9,
-                    taMin9Low = it.taMin9Low,
-                    taMin9High = it.taMin9High,
-                    taMax9 = it.taMax9,
-                    taMax9Low = it.taMax9Low,
-                    taMax9High = it.taMax9High,
-                    taMin10 = it.taMin10,
-                    taMin10Low = it.taMin10Low,
-                    taMin10High = it.taMin10High,
-                    taMax10 = it.taMax10,
-                    taMax10Low = it.taMax10Low,
-                    taMax10High = it.taMax10High,
+                    taMin_3 = it.taMin3,
+                    taMin_3Low = it.taMin3Low,
+                    taMin_3High = it.taMin3High,
+                    taMax_3 = it.taMax3,
+                    taMax_3Low = it.taMax3Low,
+                    taMax_3High = it.taMax3High,
+                    taMin_4 = it.taMin4,
+                    taMin_4Low = it.taMin4Low,
+                    taMin_4High = it.taMin4High,
+                    taMax_4 = it.taMax4,
+                    taMax_4Low = it.taMax4Low,
+                    taMax_4High = it.taMax4High,
+                    taMin_5 = it.taMin5,
+                    taMin_5Low = it.taMin5Low,
+                    taMin_5High = it.taMin5High,
+                    taMax_5 = it.taMax5,
+                    taMax_5Low = it.taMax5Low,
+                    taMax_5High = it.taMax5High,
+                    taMin_6 = it.taMin6,
+                    taMin_6Low = it.taMin6Low,
+                    taMin_6High = it.taMin6High,
+                    taMax_6 = it.taMax6,
+                    taMax_6Low = it.taMax6Low,
+                    taMax_6High = it.taMax6High,
+                    taMin_7 = it.taMin7,
+                    taMin_7Low = it.taMin7Low,
+                    taMin_7High = it.taMin7High,
+                    taMax_7 = it.taMax7,
+                    taMax_7Low = it.taMax7Low,
+                    taMax_7High = it.taMax7High,
+                    taMin_8 = it.taMin8,
+                    taMin_8Low = it.taMin8Low,
+                    taMin_8High = it.taMin8High,
+                    taMax_8 = it.taMax8,
+                    taMax_8Low = it.taMax8Low,
+                    taMax_8High = it.taMax8High,
+                    taMin_9 = it.taMin9,
+                    taMin_9Low = it.taMin9Low,
+                    taMin_9High = it.taMin9High,
+                    taMax_9 = it.taMax9,
+                    taMax_9Low = it.taMax9Low,
+                    taMax_9High = it.taMax9High,
+                    taMin_10 = it.taMin10,
+                    taMin_10Low = it.taMin10Low,
+                    taMin_10High = it.taMin10High,
+                    taMax_10 = it.taMax10,
+                    taMax_10Low = it.taMax10Low,
+                    taMax_10High = it.taMax10High,
                 ).toMono()
             }
             .collectList()
