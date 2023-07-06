@@ -1,7 +1,6 @@
 package eom.tri.weather.controller
 
 import eom.tri.weather.model.Address
-import eom.tri.weather.model.GovernmentAPI.GovernmentPublicAPIResponse
 import eom.tri.weather.model.MidForecast
 import eom.tri.weather.model.MidTemperatureForecast
 import eom.tri.weather.model.ShortForecast

@@ -33,8 +33,8 @@ class WeatherDataCollectingService(
      * @description 발표일 , 발표시각, 예보지점의 X,Y 좌표를 통해 조회 한 후 DB에 저장합니다.(단기 예보)
      */
 
-//    @PostConstruct
-//    @Transactional
+ /*   @PostConstruct
+    @Transactional*/
     fun collectWeatherData() {
         val fixedBaseDate = utilFunctions.toDateStr(LocalDateTime.now(), "yyyyMMdd")
         val fixedBaseTime = "0200"
@@ -57,8 +57,8 @@ class WeatherDataCollectingService(
      * @description 발표일 , 발표시각, 예보지점의 Code를 통하여 조회 한 후 DB에 저장합니다.(중기 예보)
      */
 
-    @PostConstruct
-    @Transactional
+    /*@PostConstruct
+    @Transactional*/
     fun collectMidWeatherData() {
         val fixedBaseDate = utilFunctions.toDateStr(LocalDateTime.now(), "yyyyMMdd")
         val fixedBaseTime = "0600"
@@ -81,8 +81,8 @@ class WeatherDataCollectingService(
      * @description 발표일 , 발표시각, 예보지점의 Code를 통하여 조회 한 후 DB에 저장합니다.(중기 온도 예보)
      */
 
-    @PostConstruct
-    @Transactional
+/*    @PostConstruct
+    @Transactional*/
     fun collectMidTemperatureWeatherData() {
         val fixedBaseDate = utilFunctions.toDateStr(LocalDateTime.now(), "yyyyMMdd")
         val fixedBaseTime = "0600"
