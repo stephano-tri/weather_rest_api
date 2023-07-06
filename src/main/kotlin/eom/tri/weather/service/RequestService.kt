@@ -7,6 +7,7 @@ import eom.tri.weather.model.GovernmentAPI.typed.MidTermForecast
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.web.reactive.function.client.bodyToMono
 import org.springframework.web.util.DefaultUriBuilderFactory
 import reactor.core.publisher.Mono
 
@@ -69,6 +70,16 @@ class RequestService {
                 println("error occur in ${locationId}: ${it.message} ")
                 Mono.empty()
             }
+    }
+
+    fun saveRequestLog(log : MutableMap<String, String>): Mono<String> {
+        return WebClient.builder()
+            .build()
+            .post()
+            .uri("http://elasticsearch:9200/request.log/_doc")
+            .bodyValue(log)
+            .retrieve()
+            .bodyToMono(String::class.java)
     }
 
 

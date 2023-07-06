@@ -3,6 +3,8 @@ package eom.tri.weather.controller
 import eom.tri.weather.exception.HttpError
 import eom.tri.weather.exception.InvalidInputException
 import eom.tri.weather.exception.NotFoundException
+import eom.tri.weather.service.RequestService
+import org.apache.logging.log4j.core.util.SystemMillisClock
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
@@ -15,7 +17,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.server.ServerWebExchange
 
 @RestControllerAdvice
-class GlobalExceptionHandler {
+class GlobalExceptionHandler(
+    private val requestService : RequestService,
+    ) {
     private val logger: Logger= LoggerFactory.getLogger(GlobalExceptionHandler::class.java)
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
@@ -32,9 +36,21 @@ class GlobalExceptionHandler {
     private fun createHttpError(status: HttpStatus, request: ServerHttpRequest, response: ServerHttpResponse, ex: Exception): HttpError {
         val path = request.path.pathWithinApplication().value()
         var message = ex.localizedMessage
+        val requestId = request.id
+        val clock = SystemMillisClock().currentTimeMillis()
+
+        val requestLogMap = mutableMapOf(
+            "requestId" to requestId,
+            "path" to path,
+            "status" to status.toString(),
+            "created" to clock.toString(),
+            "message" to message,
+        )
+
+        requestService.saveRequestLog(requestLogMap).subscribe()
 
         logger.debug("Returning HTTP status: {} for path: {}, message: {}, cause:{}", status, path, message,ex.cause)
         response.statusCode = status
-        return HttpError(path, status, message)
+        return HttpError(id = requestId, path, status, message)
     }
 }
