@@ -1,5 +1,6 @@
 package eom.tri.weather.model
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import org.springframework.data.annotation.Id
 
 data class MidTemperatureForecast (
@@ -7,7 +8,7 @@ data class MidTemperatureForecast (
         val id: Long? = null,
         val regId: String,
         val refDate: String,
-        val taMin3: String,
+        @field:JsonProperty("3일후_최저_예상기온") val taMin3: String,
         val taMin3Low: String,
         val taMin3High: String,
         val taMax3: String,
