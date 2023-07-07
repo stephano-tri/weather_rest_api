@@ -43,6 +43,7 @@ class WeatherDataCollectingService(
                     }
                     .flatMap {
                         requestService.getShortTermWeatherForecast(fixedBaseDate, fixedBaseTime, it.t1, it.t2, 280)
+                            .onErrorResume { Mono.empty() }
                             .flatMap { res ->
                                 saveShortTermForecast(res)
                             }
@@ -68,6 +69,7 @@ class WeatherDataCollectingService(
                     }
                     .flatMap { location ->
                         requestService.getMidTermWeatherForecast(location, fixedBaseDate + fixedBaseTime)
+                            .onErrorResume { Mono.empty() }
                             .flatMap { res ->
                                 saveMidTermForecast(res, fixedBaseDate + fixedBaseTime)
                             }
@@ -94,6 +96,7 @@ class WeatherDataCollectingService(
                     }
                     .flatMap { location ->
                         requestService.getMidTermTmpWeatherForecast(location, fixedBaseDate + fixedBaseTime)
+                            .onErrorResume { Mono.empty() }
                             .flatMap { res ->
                                 logger.debug("res : $res")
                                 saveMidTermTempForecast(res, fixedBaseDate + fixedBaseTime)
@@ -107,7 +110,7 @@ class WeatherDataCollectingService(
     }
 
 
-    @PostConstruct
+//    @PostConstruct
     fun onInitCollectingData() {
         collectMidWeatherData()
             .flatMap {
@@ -119,17 +122,6 @@ class WeatherDataCollectingService(
             .subscribe()
     }
 
-
-    /**
-     * @author stephano-tri
-     * @description 해당 날짜의 날씨를 조회하고 없을 경우 공공API에서 조회하여 DB에 저장합니다.
-     */
-
-    private fun getWeatherDataForNFE(fcstDate: String, nx: Int, ny: Int) {
-        requestService.getShortTermWeatherForecast(fcstDate, "0200", nx, ny, 300)
-            .flatMap { res -> saveShortTermForecast(res) }
-            .subscribe()
-    }
 
     private fun saveMidTermTempForecast(govData: GovernmentPublicAPIMidTmpResponse, refDate: String) : Mono<MutableList<MidTermForecastTempEntity>> {
         return Flux.fromIterable(govData.response.body.items.item)

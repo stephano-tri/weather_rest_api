@@ -30,10 +30,7 @@ class RequestService {
             .accept(org.springframework.http.MediaType.APPLICATION_JSON)
             .retrieve()
             .bodyToMono(GovernmentPublicAPIResponse::class.java)
-            .onErrorResume {
-                println("error occur in $posX $posY: ${it.message}")
-                Mono.empty()
-            }
+
     }
 
     fun getMidTermWeatherForecast(locationId: String, announceDate: String): Mono<GovernmentPublicAPIMidResponse> {
@@ -48,10 +45,6 @@ class RequestService {
             .accept(org.springframework.http.MediaType.APPLICATION_JSON)
             .retrieve()
             .bodyToMono(GovernmentPublicAPIMidResponse::class.java)
-            .onErrorResume {
-                println("error occur in ${locationId}: ${it.message} ")
-                Mono.empty()
-            }
     }
 
     fun getMidTermTmpWeatherForecast(locationId: String, announceDate: String): Mono<GovernmentPublicAPIMidTmpResponse> {
@@ -66,10 +59,7 @@ class RequestService {
             .accept(org.springframework.http.MediaType.APPLICATION_JSON)
             .retrieve()
             .bodyToMono(GovernmentPublicAPIMidTmpResponse::class.java)
-            .onErrorResume {
-                println("error occur in ${locationId}: ${it.message} ")
-                Mono.empty()
-            }
+
     }
 
     fun saveRequestLog(log : MutableMap<String, String>): Mono<String> {

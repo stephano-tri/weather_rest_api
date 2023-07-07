@@ -2,7 +2,10 @@ package eom.tri.weather.service
 
 import eom.tri.weather.controller.WeatherController
 import eom.tri.weather.exception.InvalidInputException
+import eom.tri.weather.exception.NotFoundException
 import eom.tri.weather.model.Address
+import eom.tri.weather.model.GovernmentAPI.typed.MidTermForecast
+import eom.tri.weather.model.GovernmentAPI.typed.MidTermTmpForecast
 import eom.tri.weather.model.MidForecast
 import eom.tri.weather.model.MidTemperatureForecast
 import eom.tri.weather.model.ShortForecast
@@ -38,7 +41,6 @@ class WeatherControllerImpl(
                 Mono.zip(loc.posX.toMono() , loc.posY.toMono())
             }
 
-
         return searchCoordinateByRegionCode
             .flatMap {
                 shortTermForecastRepository.findAllByFcstDateAndNxAndNy(today, it.t1, it.t2)
@@ -47,18 +49,27 @@ class WeatherControllerImpl(
                             this.category = shortTermCategoryConverter(this.category!!)
                         }.cast2ShortTermPojo()
                     }.collectList()
-                    .switchIfEmpty(
-                        requestService.getShortTermWeatherForecast(today, "0200", it.t1, it.t2, 280)
-                            .flatMapIterable { it.response.body.items.item }
-                            .flatMap { shortForecast ->
-                                ShortForecast(
-                                    fcstTime = shortForecast.fcstTime,
-                                    category = shortTermCategoryConverter(shortForecast.category),
-                                    fcstValue = shortForecast.fcstValue,
-                                ).toMono()
-                            }
-                            .collectList()
-                    )
+                    .flatMap { result ->
+                        if(result.isEmpty()){
+                            requestService.getShortTermWeatherForecast(today, "0200", it.t1, it.t2, 280)
+                                .onErrorResume {
+                                    logger.error("error : ${it.message}")
+                                    NotFoundException("해당 지역의 단기예보 정보가 저장되어 있지 않아 OPEN API릁 통해 요청하였으나 요청 한도를 초과하여 실패했습니다.").toMono()
+                                }
+                                .flatMapIterable { it.response.body.items.item }
+                                .flatMap { shortForecast ->
+                                    ShortForecast(
+                                        fcstTime = shortForecast.fcstTime,
+                                        category = shortTermCategoryConverter(shortForecast.category),
+                                        fcstValue = shortForecast.fcstValue,
+                                    ).toMono()
+                                }
+                                .collectList()
+                        }
+                        else {
+                            result.toMono()
+                        }
+                    }
             }
     }
 
@@ -70,6 +81,20 @@ class WeatherControllerImpl(
             .flatMap { midTermForecastEn ->
                 midTermForecastEn.cast2MidForecastPojo()
             }
+            .switchIfEmpty(
+                requestService.getMidTermWeatherForecast(regionCode, today + fixedTime)
+                    .flatMapIterable {
+                        it.response.body.items.item
+                    }
+                    .elementAt(0)
+                    .flatMap {
+                       convertAPIResponseToMidTermPojo(it, today)
+                    }
+                    .onErrorResume {
+                        logger.error("error : ${it.message}")
+                        NotFoundException("해당 지역의 중기예보 정보가 저장되어 있지 않아 OPEN API릁 통해 요청하였으나 요청 한도를 초과하여 실패했습니다.").toMono()
+                    }
+            )
 
         return searchMidtermForecast.elementAt(0)
     }
@@ -82,6 +107,20 @@ class WeatherControllerImpl(
             .flatMap { midTermForecastTempEn ->
                 midTermForecastTempEn.cast2MidForecastTemperaturePojo()
             }
+            .switchIfEmpty(
+                requestService.getMidTermTmpWeatherForecast(regionCode, today + fixedTime)
+                    .flatMapIterable {
+                        it.response.body.items.item
+                    }
+                    .elementAt(0)
+                    .flatMap {
+                        convertAPIResponseToMidTermTempPojo(it, today)
+                    }
+                    .onErrorResume {
+                        logger.error("error : ${it.message}")
+                        NotFoundException("해당 지역의 중기예보 정보가 저장되어 있지 않아 OPEN API릁 통해 요청하였으나 요청 한도를 초과하여 실패했습니다.").toMono()
+                    }
+            )
 
         return searchMidTermTemperatureForecast.elementAt(0)
     }
@@ -221,6 +260,95 @@ class WeatherControllerImpl(
             taMax10Low = this.taMax_10Low,
             taMax10High = this.taMax_10High,
         ).toMono()
+
+
+    private fun convertAPIResponseToMidTermPojo(forecast: MidTermForecast , date: String): Mono<MidForecast> {
+        return MidForecast(
+            regId = forecast.regId,
+            refDate = date,
+            rnSt3Am = forecast.rnSt3Am,
+            rnSt3Pm = forecast.rnSt3Pm,
+            rnSt4Am = forecast.rnSt4Am,
+            rnSt4Pm = forecast.rnSt4Pm,
+            rnSt5Am = forecast.rnSt5Am,
+            rnSt5Pm = forecast.rnSt5Pm,
+            rnSt6Am = forecast.rnSt6Am,
+            rnSt6Pm = forecast.rnSt6Pm,
+            rnSt7Am = forecast.rnSt7Am,
+            rnSt7Pm = forecast.rnSt7Pm,
+            rnSt8 = forecast.rnSt8,
+            rnSt9 = forecast.rnSt9,
+            rnSt10 = forecast.rnSt10,
+            wf3Am = forecast.wf3Am,
+            wf3Pm = forecast.wf3Pm,
+            wf4Am = forecast.wf4Am,
+            wf4Pm = forecast.wf4Pm,
+            wf5Am = forecast.wf5Am,
+            wf5Pm = forecast.wf5Pm,
+            wf6Am = forecast.wf6Am,
+            wf6Pm = forecast.wf6Pm,
+            wf7Am = forecast.wf7Am,
+            wf7Pm = forecast.wf7Pm,
+            wf8 = forecast.wf8,
+            wf9 = forecast.wf9,
+            wf10 = forecast.wf10,
+        ).toMono()
+    }
+
+    private fun convertAPIResponseToMidTermTempPojo(forecast: MidTermTmpForecast, date: String): Mono<MidTemperatureForecast> {
+        return MidTemperatureForecast(
+            regId = forecast.regId,
+            refDate = date,
+            taMin3 = forecast.taMin3,
+            taMin3Low = forecast.taMin3Low,
+            taMin3High = forecast.taMin3High,
+            taMax3 = forecast.taMax3,
+            taMax3Low = forecast.taMax3Low,
+            taMax3High = forecast.taMax3High,
+            taMin4 = forecast.taMin4,
+            taMin4Low = forecast.taMin4Low,
+            taMin4High = forecast.taMin4High,
+            taMax4 = forecast.taMax4,
+            taMax4Low = forecast.taMax4Low,
+            taMax4High = forecast.taMax4High,
+            taMin5 = forecast.taMin5,
+            taMin5Low = forecast.taMin5Low,
+            taMin5High = forecast.taMin5High,
+            taMax5 = forecast.taMax5,
+            taMax5Low = forecast.taMax5Low,
+            taMax5High = forecast.taMax5High,
+            taMin6 = forecast.taMin6,
+            taMin6Low = forecast.taMin6Low,
+            taMin6High = forecast.taMin6High,
+            taMax6 = forecast.taMax6,
+            taMax6Low = forecast.taMax6Low,
+            taMax6High = forecast.taMax6High,
+            taMin7 = forecast.taMin7,
+            taMin7Low = forecast.taMin7Low,
+            taMin7High = forecast.taMin7High,
+            taMax7 = forecast.taMax7,
+            taMax7Low = forecast.taMax7Low,
+            taMax7High = forecast.taMax7High,
+            taMin8 = forecast.taMin8,
+            taMin8Low = forecast.taMin8Low,
+            taMin8High = forecast.taMin8High,
+            taMax8 = forecast.taMax8,
+            taMax8Low = forecast.taMax8Low,
+            taMax8High = forecast.taMax8High,
+            taMin9 = forecast.taMin9,
+            taMin9Low = forecast.taMin9Low,
+            taMin9High = forecast.taMin9High,
+            taMax9 = forecast.taMax9,
+            taMax9Low = forecast.taMax9Low,
+            taMax9High = forecast.taMax9High,
+            taMin10 = forecast.taMin10,
+            taMin10Low = forecast.taMin10Low,
+            taMin10High = forecast.taMin10High,
+            taMax10 = forecast.taMax10,
+            taMax10Low = forecast.taMax10Low,
+            taMax10High = forecast.taMax10High,
+        ).toMono()
+    }
 
 
     private fun shortTermCategoryConverter(category: String): String {
