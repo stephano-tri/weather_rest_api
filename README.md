@@ -9,8 +9,8 @@ Webflux
 
 ## Before you install
 ```
-if you need to volume mounting`                        
-edit docker-compose.yml(mysql, elasticsearch)`   
+if you need to volume mounting                        
+edit docker-compose.yml(mysql, elasticsearch)   
 remove comment and change path(/Users/Eomjihwan <- this part)
 ```
 
