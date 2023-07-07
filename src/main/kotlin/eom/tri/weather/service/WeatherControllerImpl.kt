@@ -360,6 +360,7 @@ class WeatherControllerImpl(
             "S06" -> "6시간 신적설"
             "SKY" -> "하늘상태"
             "T3H" -> "3시간 기온"
+            "TMP" -> "기온"
             "TMN" -> "아침 최저기온"
             "TMX" -> "낮 최고기온"
             "UUU" -> "풍속(동서성분)"
@@ -367,6 +368,8 @@ class WeatherControllerImpl(
             "WAV" -> "파고"
             "VEC" -> "풍향"
             "WSD" -> "풍속"
+            "SNO" -> "적설"
+            "PCP" -> "강수"
             else -> "알수 없음"
         }
     }
