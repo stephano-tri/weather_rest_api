@@ -21,7 +21,7 @@ _**remember this project need JAVA17 !!**_
 ## DB Install
 ```
 docker exec -it mysql bin/bash
-mysql -uroot -p --port 3306 < init.sql
+mysql -u root -p --port 3306 < init.sql
 ```
 _**Jasync not support caching_sha2_password**_
 ```
@@ -68,7 +68,49 @@ docker exec mysql bash -c 'exec mysqldump --databases "weather" -h mysql -u"root
 ![image](https://github.com/stephano-tri/weather_rest_api/assets/62496713/c3c9df7b-89a9-460d-9bee-505db609ca7d)
 
 
-### API Docs
+## API Docs
+#### i) 주소 코드 조회
+**RequestParam**    
+ > **type** : short, mid, mid-temp    
+  **regionName** : 지역명(short의 경우 동이름까지도 지원합니다. mid는 시,도명만 지원합니다)
+
+**Example**
 ```
-Notion Links
+curl --location --request GET 'localhost:8080/api/v1/forecast/address/search?type=short&regionName=인천'
 ```
+
+* * *
+
+#### ii) 단기 예보 조회
+**RequestParam**    
+>  **regionCode** : 지역 코드(주소 코드 조회에서 불러온 코드를 사용합니다.)   
+
+**Example**
+```
+curl --location --request GET 'localhost:8080/api/v1/today/forecast/load?regionCode=11A34CB00'
+```
+
+* * *
+
+#### iii) 중기 예보 조회
+**RequestParam**
+>  **regionCode** : 지역 코드(주소 코드 조회에서 불러온 코드를 사용합니다.)    
+
+**Example**
+```
+curl --location --request GET 'localhost:8080/api/v1/midterm/forecast/load?regionCode=11A34CB00'
+```
+
+* * *
+
+#### iv) 중기-기온 예보 조회
+**RequestParam**
+>  **regionCode** : 지역 코드(주소 코드 조회에서 불러온 코드를 사용합니다.)
+ 
+**Example** 
+```
+curl --location --request GET 'localhost:8080/api/v1/midterm/temperature/forecast/load?regionCode=11A34CB00'
+```
+
+* * *
+
