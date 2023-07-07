@@ -13,5 +13,5 @@ data class ShortTermForecastEntity(
     val nx: Int? = null,
     val ny: Int? = null,
     val fcstValue: String? = null,
-    val category: String? = null,
+    var category: String? = null,
 )
