@@ -110,7 +110,7 @@ class WeatherDataCollectingService(
     }
 
 
-//    @PostConstruct
+    @PostConstruct
     fun onInitCollectingData() {
         collectMidWeatherData()
             .flatMap {
