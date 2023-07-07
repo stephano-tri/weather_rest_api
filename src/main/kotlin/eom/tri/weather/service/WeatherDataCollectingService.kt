@@ -44,7 +44,7 @@ class WeatherDataCollectingService(
                 Mono.zip(it.posX.toMono() , it.posY.toMono())
             }
             .flatMap {
-                requestService.getShortTermWeatherForecast(fixedBaseDate, fixedBaseTime, it.t1, it.t2, 200)
+                requestService.getShortTermWeatherForecast(fixedBaseDate, fixedBaseTime, it.t1, it.t2, 300)
                     .flatMap { res ->
                         saveShortTermForecast(res)
                     }
@@ -108,7 +108,7 @@ class WeatherDataCollectingService(
      */
 
     private fun getWeatherDataForNFE(fcstDate: String, nx: Int, ny: Int) {
-        requestService.getShortTermWeatherForecast(fcstDate, "0200", nx, ny, 200)
+        requestService.getShortTermWeatherForecast(fcstDate, "0200", nx, ny, 300)
             .flatMap { res -> saveShortTermForecast(res) }
             .subscribe()
     }

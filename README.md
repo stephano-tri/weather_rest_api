@@ -12,6 +12,11 @@ Webflux
 `edit docker-compose.yml(mysql, elasticsearch)`    
 `remove comment and change path(/Users/Eomjihwan <- this part)`
 
+```
+공공API의 최대 요청 횟수 제한으로 인하여 data gathering function이 동작하지    
+못할 경우를 대비하여 7월 7일자 data는 넣어놨습니다.
+```
+
 ## How to run
 _**remember this project need JAVA17 !!**_
 ```
