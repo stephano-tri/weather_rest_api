@@ -33,23 +33,24 @@ class WeatherDataCollectingService(
      * @description 발표일 , 발표시각, 예보지점의 X,Y 좌표를 통해 조회 한 후 DB에 저장합니다.(단기 예보)
      */
 
-    @PostConstruct
-    @Transactional
-    fun collectWeatherData() {
+    fun collectWeatherData(): Mono<Boolean> {
         val fixedBaseDate = utilFunctions.toDateStr(LocalDateTime.now(), "yyyyMMdd")
         val fixedBaseTime = "0200"
 
-        locationShortRepository.findAllDistinctPos()
-            .flatMap {
-                Mono.zip(it.posX.toMono() , it.posY.toMono())
-            }
-            .flatMap {
-                requestService.getShortTermWeatherForecast(fixedBaseDate, fixedBaseTime, it.t1, it.t2, 300)
-                    .flatMap { res ->
-                        saveShortTermForecast(res)
+        return locationShortRepository.findAllDistinctPos()
+                    .flatMap {
+                        Mono.zip(it.posX.toMono() , it.posY.toMono())
                     }
-            }
-            .subscribe()
+                    .flatMap {
+                        requestService.getShortTermWeatherForecast(fixedBaseDate, fixedBaseTime, it.t1, it.t2, 280)
+                            .flatMap { res ->
+                                saveShortTermForecast(res)
+                            }
+                    }
+                    .collectList()
+                    .flatMap {
+                        true.toMono()
+                    }
     }
 
     /**
@@ -57,22 +58,24 @@ class WeatherDataCollectingService(
      * @description 발표일 , 발표시각, 예보지점의 Code를 통하여 조회 한 후 DB에 저장합니다.(중기 예보)
      */
 
-    @PostConstruct
-    @Transactional
-    fun collectMidWeatherData() {
+    fun collectMidWeatherData(): Mono<Boolean> {
         val fixedBaseDate = utilFunctions.toDateStr(LocalDateTime.now(), "yyyyMMdd")
         val fixedBaseTime = "0600"
 
-        locationMidRepository.findAll()
-            .flatMap {
-                it.code.toMono()
-            }
-            .flatMap { location ->
-                requestService.getMidTermWeatherForecast(location, fixedBaseDate + fixedBaseTime)
-                    .flatMap { res ->
-                        saveMidTermForecast(res, fixedBaseDate + fixedBaseTime)
+        return locationMidRepository.findAll()
+                    .flatMap {
+                        it.code.toMono()
                     }
-            }.subscribe()
+                    .flatMap { location ->
+                        requestService.getMidTermWeatherForecast(location, fixedBaseDate + fixedBaseTime)
+                            .flatMap { res ->
+                                saveMidTermForecast(res, fixedBaseDate + fixedBaseTime)
+                            }
+                    }
+                    .collectList()
+                    .flatMap {
+                        true.toMono()
+                    }
     }
 
 
@@ -81,24 +84,39 @@ class WeatherDataCollectingService(
      * @description 발표일 , 발표시각, 예보지점의 Code를 통하여 조회 한 후 DB에 저장합니다.(중기 온도 예보)
      */
 
-    @PostConstruct
-    @Transactional
-    fun collectMidTemperatureWeatherData() {
+    fun collectMidTemperatureWeatherData(): Mono<Boolean> {
         val fixedBaseDate = utilFunctions.toDateStr(LocalDateTime.now(), "yyyyMMdd")
         val fixedBaseTime = "0600"
 
-        locationMidTempRepository.findAll()
-            .flatMap {
-                it.code.toMono()
-            }
-            .flatMap { location ->
-                requestService.getMidTermTmpWeatherForecast(location, fixedBaseDate + fixedBaseTime)
-                    .flatMap { res ->
-                        logger.debug("res : $res")
-                        saveMidTermTempForecast(res, fixedBaseDate + fixedBaseTime)
+        return locationMidTempRepository.findAll()
+                    .flatMap {
+                        it.code.toMono()
                     }
-            }.subscribe()
+                    .flatMap { location ->
+                        requestService.getMidTermTmpWeatherForecast(location, fixedBaseDate + fixedBaseTime)
+                            .flatMap { res ->
+                                logger.debug("res : $res")
+                                saveMidTermTempForecast(res, fixedBaseDate + fixedBaseTime)
+                            }
+                    }
+                    .collectList()
+                    .flatMap {
+                        true.toMono()
+                    }
 
+    }
+
+
+    @PostConstruct
+    fun onInitCollectingData() {
+        collectMidWeatherData()
+            .flatMap {
+                collectMidTemperatureWeatherData()
+            }
+            .flatMap {
+                collectWeatherData()
+            }
+            .subscribe()
     }
 
 

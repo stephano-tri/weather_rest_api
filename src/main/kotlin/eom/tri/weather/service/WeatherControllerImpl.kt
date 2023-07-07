@@ -38,6 +38,7 @@ class WeatherControllerImpl(
                 Mono.zip(loc.posX.toMono() , loc.posY.toMono())
             }
 
+
         return searchCoordinateByRegionCode
             .flatMap {
                 shortTermForecastRepository.findAllByFcstDateAndNxAndNy(today, it.t1, it.t2)
@@ -46,6 +47,18 @@ class WeatherControllerImpl(
                             this.category = shortTermCategoryConverter(this.category!!)
                         }.cast2ShortTermPojo()
                     }.collectList()
+                    .switchIfEmpty(
+                        requestService.getShortTermWeatherForecast(today, "0200", it.t1, it.t2, 280)
+                            .flatMapIterable { it.response.body.items.item }
+                            .flatMap { shortForecast ->
+                                ShortForecast(
+                                    fcstTime = shortForecast.fcstTime,
+                                    category = shortTermCategoryConverter(shortForecast.category),
+                                    fcstValue = shortForecast.fcstValue,
+                                ).toMono()
+                            }
+                            .collectList()
+                    )
             }
     }
 
