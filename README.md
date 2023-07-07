@@ -34,7 +34,6 @@ _**remember this project need JAVA17 !!**_
 
 ## DB Install
 _**db_password -> stephano-tri(infer docker-compose.yml)**_
-
 ```
 docker exec -it mysql bin/bash 
 cd docker-entrypoint-initdb.d 
