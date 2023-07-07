@@ -104,7 +104,7 @@ curl --location --request GET 'localhost:8080/api/v1/forecast/address/search?typ
 
 **Example**
 ```
-curl --location --request GET 'localhost:8080/api/v1/today/forecast/load?regionCode=11A34CB00'
+curl --location --request GET 'localhost:8080/api/v1/today/forecast/load?regionCode=4148039000'
 ```
 
 * * *
@@ -115,7 +115,7 @@ curl --location --request GET 'localhost:8080/api/v1/today/forecast/load?regionC
 
 **Example**
 ```
-curl --location --request GET 'localhost:8080/api/v1/midterm/forecast/load?regionCode=11A34CB00'
+curl --location --request GET 'localhost:8080/api/v1/midterm/forecast/load?regionCode=11B00000'
 ```
 
 * * *
@@ -126,7 +126,7 @@ curl --location --request GET 'localhost:8080/api/v1/midterm/forecast/load?regio
  
 **Example** 
 ```
-curl --location --request GET 'localhost:8080/api/v1/midterm/temperature/forecast/load?regionCode=11A34CB00'
+curl --location --request GET 'localhost:8080/api/v1/midterm/temperature/forecast/load?regionCode=11G00401'
 ```
 
 * * *
