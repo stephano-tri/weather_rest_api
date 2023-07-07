@@ -130,3 +130,6 @@ curl --location --request GET 'localhost:8080/api/v1/midterm/temperature/forecas
 
 * * *
 
+
+#### Data 설명
+* stephano-tri/weather_rest_api#14
