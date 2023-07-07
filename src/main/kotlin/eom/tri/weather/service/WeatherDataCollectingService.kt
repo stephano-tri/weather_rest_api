@@ -33,23 +33,25 @@ class WeatherDataCollectingService(
      * @description 발표일 , 발표시각, 예보지점의 X,Y 좌표를 통해 조회 한 후 DB에 저장합니다.(단기 예보)
      */
 
-    @PostConstruct
-    @Transactional
-    fun collectWeatherData() {
+    fun collectWeatherData(): Mono<Boolean> {
         val fixedBaseDate = utilFunctions.toDateStr(LocalDateTime.now(), "yyyyMMdd")
         val fixedBaseTime = "0200"
 
-        locationShortRepository.findAllDistinctPos()
-            .flatMap {
-                Mono.zip(it.posX.toMono() , it.posY.toMono())
-            }
-            .flatMap {
-                requestService.getShortTermWeatherForecast(fixedBaseDate, fixedBaseTime, it.t1, it.t2, 200)
-                    .flatMap { res ->
-                        saveShortTermForecast(res)
+        return locationShortRepository.findAllDistinctPos()
+                    .flatMap {
+                        Mono.zip(it.posX.toMono() , it.posY.toMono())
                     }
-            }
-            .subscribe()
+                    .flatMap {
+                        requestService.getShortTermWeatherForecast(fixedBaseDate, fixedBaseTime, it.t1, it.t2, 280)
+                            .onErrorResume { Mono.empty() }
+                            .flatMap { res ->
+                                saveShortTermForecast(res)
+                            }
+                    }
+                    .collectList()
+                    .flatMap {
+                        true.toMono()
+                    }
     }
 
     /**
@@ -57,22 +59,25 @@ class WeatherDataCollectingService(
      * @description 발표일 , 발표시각, 예보지점의 Code를 통하여 조회 한 후 DB에 저장합니다.(중기 예보)
      */
 
-    @PostConstruct
-    @Transactional
-    fun collectMidWeatherData() {
+    fun collectMidWeatherData(): Mono<Boolean> {
         val fixedBaseDate = utilFunctions.toDateStr(LocalDateTime.now(), "yyyyMMdd")
         val fixedBaseTime = "0600"
 
-        locationMidRepository.findAll()
-            .flatMap {
-                it.code.toMono()
-            }
-            .flatMap { location ->
-                requestService.getMidTermWeatherForecast(location, fixedBaseDate + fixedBaseTime)
-                    .flatMap { res ->
-                        saveMidTermForecast(res, fixedBaseDate + fixedBaseTime)
+        return locationMidRepository.findAll()
+                    .flatMap {
+                        it.code.toMono()
                     }
-            }.subscribe()
+                    .flatMap { location ->
+                        requestService.getMidTermWeatherForecast(location, fixedBaseDate + fixedBaseTime)
+                            .onErrorResume { Mono.empty() }
+                            .flatMap { res ->
+                                saveMidTermForecast(res, fixedBaseDate + fixedBaseTime)
+                            }
+                    }
+                    .collectList()
+                    .flatMap {
+                        true.toMono()
+                    }
     }
 
 
@@ -81,37 +86,42 @@ class WeatherDataCollectingService(
      * @description 발표일 , 발표시각, 예보지점의 Code를 통하여 조회 한 후 DB에 저장합니다.(중기 온도 예보)
      */
 
-    @PostConstruct
-    @Transactional
-    fun collectMidTemperatureWeatherData() {
+    fun collectMidTemperatureWeatherData(): Mono<Boolean> {
         val fixedBaseDate = utilFunctions.toDateStr(LocalDateTime.now(), "yyyyMMdd")
         val fixedBaseTime = "0600"
 
-        locationMidTempRepository.findAll()
-            .flatMap {
-                it.code.toMono()
-            }
-            .flatMap { location ->
-                requestService.getMidTermTmpWeatherForecast(location, fixedBaseDate + fixedBaseTime)
-                    .flatMap { res ->
-                        logger.debug("res : $res")
-                        saveMidTermTempForecast(res, fixedBaseDate + fixedBaseTime)
+        return locationMidTempRepository.findAll()
+                    .flatMap {
+                        it.code.toMono()
                     }
-            }.subscribe()
+                    .flatMap { location ->
+                        requestService.getMidTermTmpWeatherForecast(location, fixedBaseDate + fixedBaseTime)
+                            .onErrorResume { Mono.empty() }
+                            .flatMap { res ->
+                                logger.debug("res : $res")
+                                saveMidTermTempForecast(res, fixedBaseDate + fixedBaseTime)
+                            }
+                    }
+                    .collectList()
+                    .flatMap {
+                        true.toMono()
+                    }
 
     }
 
 
-    /**
-     * @author stephano-tri
-     * @description 해당 날짜의 날씨를 조회하고 없을 경우 공공API에서 조회하여 DB에 저장합니다.
-     */
-
-    private fun getWeatherDataForNFE(fcstDate: String, nx: Int, ny: Int) {
-        requestService.getShortTermWeatherForecast(fcstDate, "0200", nx, ny, 200)
-            .flatMap { res -> saveShortTermForecast(res) }
+    @PostConstruct
+    fun onInitCollectingData() {
+        collectMidWeatherData()
+            .flatMap {
+                collectMidTemperatureWeatherData()
+            }
+            .flatMap {
+                collectWeatherData()
+            }
             .subscribe()
     }
+
 
     private fun saveMidTermTempForecast(govData: GovernmentPublicAPIMidTmpResponse, refDate: String) : Mono<MutableList<MidTermForecastTempEntity>> {
         return Flux.fromIterable(govData.response.body.items.item)
@@ -237,24 +247,5 @@ class WeatherDataCollectingService(
                     }
     }
 
-    private fun shortTermCategoryConverter(category: String): String {
-        return when(category){
-                    "POP" -> "강수확률"
-                    "PTY" -> "강수형태"
-                    "R06" -> "6시간 강수량"
-                    "REH" -> "습도"
-                    "S06" -> "6시간 신적설"
-                    "SKY" -> "하늘상태"
-                    "T3H" -> "3시간 기온"
-                    "TMN" -> "아침 최저기온"
-                    "TMX" -> "낮 최고기온"
-                    "UUU" -> "풍속(동서성분)"
-                    "VVV" -> "풍속(남북성분)"
-                    "WAV" -> "파고"
-                    "VEC" -> "풍향"
-                    "WSD" -> "풍속"
-                else -> "알수 없음"
-        }
-    }
 
 }

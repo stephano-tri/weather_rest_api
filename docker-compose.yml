@@ -15,6 +15,11 @@ services:
     volumes:
       - ./schema/:/docker-entrypoint-initdb.d
 #      - /Users/eomjihwan/mysql:/var/lib/mysql
+    healthcheck:
+      test: "/usr/bin/mysql --user=root --password=stephano-tri --execute \"SHOW DATABASES;\""
+      interval: 2s
+      timeout: 20s
+      retries: 10
 
   elasticsearch:
     container_name: elasticsearch
@@ -43,3 +48,6 @@ services:
     build: .
     ports:
       - "8080:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
