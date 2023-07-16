@@ -19,7 +19,6 @@ remove comment and change path(/Users/Eomjihwan <- this part)
 ```
 
 ```
-
 공공API(OPEN API)의 최대 요청 횟수 제한으로 인하여 data gathering function이 동작하지    
 못할 경우를 대비하여 7월 7일자 data는 넣어놨습니다.
 
@@ -87,7 +86,7 @@ docker exec mysql bash -c 'exec mysqldump --databases "weather" -h mysql -u"root
 ## API Docs
 #### i) 주소 코드 조회
 **RequestParam**    
- > **type** : short, mid, mid-temp    
+ > **type** : short, mid, mid_temp    
   **regionName** : 지역명(시,도 단위로 검색해주세요 e.g. 인천,서울 )
 
 **Example**
